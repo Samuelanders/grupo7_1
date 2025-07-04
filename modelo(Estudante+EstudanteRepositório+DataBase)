@@ -1,0 +1,186 @@
+
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import com.j256.ormlite.table.DatabaseTable;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.DataType;
+
+@DatabaseTable(tableName="estudante")
+public class Estudante {
+    
+    @DatabaseField(generatedId = true)
+    private int id;
+        
+    @DatabaseField(dataType=DataType.STRING)    
+    private String nomeCompleto;
+    
+    @DatabaseField(dataType=DataType.STRING)        
+    private String dataDeNascimento;
+    
+    @DatabaseField(dataType=DataType.INTEGER)        
+    private int matricula;
+    
+
+//Start GetterSetterExtension Source Code
+
+    /**GET Method Propertie id*/
+    public int getId(){
+        return this.id;
+    }//end method getId
+
+    /**SET Method Propertie id*/
+    public void setId(int id){
+        this.id = id;
+    }//end method setId
+
+    /**GET Method Propertie nomeCompleto*/
+    public String getNomeCompleto(){
+        return this.nomeCompleto;
+    }//end method getNomeCompleto
+
+    /**SET Method Propertie nomeCompleto*/
+    public void setNomeCompleto(String nomeCompleto){
+        this.nomeCompleto = nomeCompleto;
+    }//end method setNomeCompleto
+
+    /**GET Method Propertie dataDeNascimento*/
+    public String getDataDeNascimento(){
+        return this.dataDeNascimento;
+    }//end method getDataDeNascimento
+
+    /**SET Method Propertie dataDeNascimento*/
+    public void setDataDeNascimento(String dataDeNascimento){
+        this.dataDeNascimento = dataDeNascimento;
+    }//end method setDataDeNascimento
+
+    /**GET Method Propertie matricula*/
+    public int getMatricula(){
+        return this.matricula;
+    }//end method getMatricula
+
+    /**SET Method Propertie matricula*/
+    public void setMatricula(int matricula){
+        this.matricula = matricula;
+    }//end method setMatricula
+
+//End GetterSetterExtension Source Code
+
+
+
+package model;
+
+
+import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.dao.Dao;
+import java.sql.SQLException;
+import com.j256.ormlite.table.TableUtils;
+import java.util.List;
+import java.util.ArrayList;
+
+public class EstudanteRepositorio
+{
+    private static Database database;
+    private static Dao<Estudante, Integer> dao;
+    private List<Estudante> loadedEstudantes;
+    private Estudante loadedEstudante;
+    
+    public EstudanteRepositorio(Database database) {
+        EstudanteRepositorio.setDatabase(database);
+        loadedEstudantes = new ArrayList<Estudante>();
+    }
+    
+    public static void setDatabase(Database database) {
+        EstudanteRepositorio.database = database;
+        try {
+            dao = DaoManager.createDao(database.getConnection(), Estudante.class);
+            TableUtils.createTableIfNotExists(database.getConnection(), Estudante.class);
+        }
+        catch(SQLException e) {
+            System.out.println(e);
+        }            
+    }
+    
+    public Estudante create(Estudante estudante) {
+        int nrows = 0;
+        try {
+            nrows = dao.create(estudante);
+            if ( nrows == 0 )
+                throw new SQLException("Error: object not saved");
+            this.loadedEstudante = estudante;
+            loadedEstudantes.add(estudante);
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return estudante;
+    }    
+
+    public void update(Estudante Estudante) {
+      // TODO
+    }
+
+    public void delete(Estudante Estudante) {
+      // TODO
+    }
+    
+    public Estudante loadFromId(int id) {
+        try {
+            this.loadedEstudante = dao.queryForId(id);
+            if (this.loadedEstudante != null)
+                this.loadedEstudantes.add(this.loadedEstudante);
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return this.loadedEstudante;
+    }    
+    
+    public List<Estudante> loadAll() {
+        try {
+            this.loadedEstudantes =  dao.queryForAll();
+            if (this.loadedEstudantes.size() != 0)
+                this.loadedEstudante = this.loadedEstudantes.get(0);
+
+
+import java.sql.*;
+import com.j256.ormlite.jdbc.JdbcConnectionSource;
+
+public class Database
+{
+   private String databaseName = null;
+   private JdbcConnectionSource connection = null;
+   
+   public Database(String databaseName) {
+       this.databaseName = databaseName;
+   }    
+   
+   public JdbcConnectionSource getConnection() throws SQLException {
+      if ( databaseName == null ) {
+          throw new SQLException("database name is null");
+      }
+      if ( connection == null ) {
+          try {
+              connection = new JdbcConnectionSource("jdbc:sqlite:"+databaseName);             
+            } catch ( Exception e ) {
+                System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+                System.exit(0);
+            }
+      }
+      return connection;
+   }
+   
+   public void close() {
+       if ( connection != null ) {
+           try {
+               connection.close();
+               this.connection = null;
+           } catch (java.lang.Exception e) {
+               System.err.println(e);
+           }
+       }
+   }
+}
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return this.loadedEstudantes;
+    }
+}
