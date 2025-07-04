@@ -1,0 +1,98 @@
+1. Classe Database
+Responsável por gerenciar a conexão com o banco de dados.
+
+Funcionalidades:
+Armazena o nome do arquivo do banco de dados SQLite.
+
+Cria e mantém uma instância de JdbcConnectionSource.
+
+Método getConnection() cria a conexão se ainda não existir.
+
+Método close() fecha a conexão com segurança.
+
+Pontos positivos:
+Encapsulamento adequado da conexão.
+
+Inicialização preguiçosa (lazy) da conexão.
+
+Melhorias sugeridas:
+Evitar uso de System.exit(0) dentro da biblioteca.
+
+Substituir System.out.println por um sistema de logs.
+
+Implementar AutoCloseable para usar try-with-resources.
+
+2. Classe StudentRepository
+Responsável pelas operações CRUD (Create, Read, Update, Delete) na tabela student.
+
+Funcionalidades:
+Cria o DAO para a entidade Student usando DaoManager.
+
+Garante a criação da tabela com TableUtils.createTableIfNotExists().
+
+Implementa:
+
+create(): Criação de novo estudante no banco.
+
+loadFromId(): Busca de estudante por ID.
+
+loadAll(): Retorna todos os estudantes cadastrados.
+
+(Métodos update() e delete() ainda pendentes).
+
+Pontos positivos:
+Boas práticas na criação da tabela e DAO.
+
+Armazenamento em cache (loadedStudents e loadedStudent).
+
+Tratamento de exceções com try-catch.
+
+Melhorias sugeridas:
+Evitar o uso de membros static para DAO e Database.
+
+Implementar os métodos update() e delete().
+
+Tratar duplicidade na lista loadedStudents.
+
+3. Classe Student
+Representa a entidade persistente student.
+
+Atributos:
+id: Identificador único (gerado automaticamente).
+
+fullName: Nome completo do aluno.
+
+registration: Número de matrícula.
+
+birthday: Data de nascimento (com suporte a Date via ORMLite).
+
+Funcionalidades:
+Método printBirthday() formata a data de nascimento.
+
+Conjunto completo de getters e setters.
+
+Pontos positivos:
+Mapeamento correto com anotações do ORMLite.
+
+Organização clara e documentação nos métodos.
+
+printBirthday() é útil para exibição formatada.
+
+Melhorias sugeridas:
+Tornar todos os atributos privados.
+
+Adicionar verificação de null no printBirthday().
+
+Criar construtor sem argumentos explicitamente.
+
+Criar toString() para depuração/logs.
+
+Tecnologias Utilizadas
+Java SE
+
+SQLite (via JDBC)
+
+ORMLite: Framework ORM leve para Java
+
+JDBC: Interface de conexão com banco relacional
+
