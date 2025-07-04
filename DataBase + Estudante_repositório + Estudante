@@ -1,0 +1,192 @@
+import java.sql.*;
+import com.j256.ormlite.jdbc.JdbcConnectionSource;
+
+public class Database
+{
+   private String databaseName = null;
+   private JdbcConnectionSource connection = null;
+   
+   public Database(String databaseName) {
+       this.databaseName = databaseName;
+   }    
+   
+   public JdbcConnectionSource getConnection() throws SQLException {
+      if ( databaseName == null ) {
+          throw new SQLException("database name is null");
+      }
+      if ( connection == null ) {
+          try {
+              connection = new JdbcConnectionSource("jdbc:sqlite:"+databaseName);             
+            } catch ( Exception e ) {
+                System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+                System.exit(0);
+            }
+            System.out.println("Opened database successfully");
+      }
+      return connection;
+   }
+   
+   public void close() {
+       if ( connection != null ) {
+           try {
+               connection.close();
+               this.connection = null;
+           } catch (java.lang.Exception e) {
+               System.err.println(e);
+           }
+       }
+   }
+
+
+import com.j256.ormlite.dao.DaoManager;
+import com.j256.ormlite.dao.Dao;
+import java.sql.SQLException;
+import com.j256.ormlite.table.TableUtils;
+import java.util.List;
+import java.util.ArrayList;
+
+public class StudentRepository
+{
+    private static Database database;
+    private static Dao<Student, Integer> dao;
+    private List<Student> loadedStudents;
+    private Student loadedStudent; 
+    
+    public StudentRepository(Database database) {
+        StudentRepository.setDatabase(database);
+        loadedStudents = new ArrayList<Student>();
+    }
+    
+    public static void setDatabase(Database database) {
+        StudentRepository.database = database;
+        try {
+            dao = DaoManager.createDao(database.getConnection(), Student.class);
+            TableUtils.createTableIfNotExists(database.getConnection(), Student.class);
+        }
+        catch(SQLException e) {
+            System.out.println(e);
+        }            
+    }
+    
+    public Student create(Student student) {
+        int nrows = 0;
+        try {
+            nrows = dao.create(student);
+            if ( nrows == 0 )
+                throw new SQLException("Error: object not saved");
+            this.loadedStudent = student;
+            loadedStudents.add(student);
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return student;
+    }    
+
+    public void update(Student student) {
+      // TODO
+    }
+
+    public void delete(Student student) {
+      // TODO
+    }
+    
+    public Student loadFromId(int id) {
+        try {
+            this.loadedStudent = dao.queryForId(id);
+            if (this.loadedStudent != null)
+                this.loadedStudents.add(this.loadedStudent);
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return this.loadedStudent;
+    }    
+    
+    public List<Student> loadAll() {
+        try {
+            this.loadedStudents =  dao.queryForAll();
+            if (this.loadedStudents.size() != 0)
+                this.loadedStudent = this.loadedStudents.get(0);
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+        return this.loadedStudents;
+    }
+
+    // getters and setters ommited...        
+}
+
+
+
+
+import java.util.Date;
+import java.text.SimpleDateFormat;
+import com.j256.ormlite.table.DatabaseTable;
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.field.DataType;
+
+@DatabaseTable(tableName = "student")
+public class Student
+{   
+    @DatabaseField(generatedId = true)
+    private int id;
+    
+    @DatabaseField
+    private String fullName;
+    
+    @DatabaseField
+    public int registration;
+    
+    @DatabaseField(dataType=DataType.DATE)
+    public Date birthday;    
+    
+    public String printBirthday() {
+        SimpleDateFormat dateFor = new SimpleDateFormat("dd/MM/yyyy");
+        return dateFor.format(birthday);
+    }
+
+//Start GetterSetterExtension Source Code
+
+    /**GET Method Propertie id*/
+    public int getId(){
+        return this.id;
+    }//end method getId
+
+    /**SET Method Propertie id*/
+    public void setId(int id){
+        this.id = id;
+    }//end method setId
+
+    /**GET Method Propertie fullName*/
+    public String getFullName(){
+        return this.fullName;
+    }//end method getFullName
+
+    /**SET Method Propertie fullName*/
+    public void setFullName(String fullName){
+        this.fullName = fullName;
+    }//end method setFullName
+
+    /**GET Method Propertie registration*/
+    public int getRegistration(){
+        return this.registration;
+    }//end method getRegistration
+
+    /**SET Method Propertie registration*/
+    public void setRegistration(int registration){
+        this.registration = registration;
+    }//end method setRegistration
+
+    /**GET Method Propertie birthday*/
+    public Date getBirthday(){
+        return this.birthday;
+    }//end method getBirthday
+
+    /**SET Method Propertie birthday*/
+    public void setBirthday(Date birthday){
+        this.birthday = birthday;
+    }//end method setBirthday
+
+//End GetterSetterExtension Source Code
+
+
+}//End class
